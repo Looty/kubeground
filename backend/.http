@@ -1,0 +1,24 @@
+@hostname = http://localhost:4000
+
+// Get all levels
+GET {{hostname}}
+
+###
+
+// Healthcheck
+GET {{hostname}}/healthz
+
+###
+
+// Get a level
+GET {{hostname}}/level/1
+
+###
+
+// Start a level
+POST {{hostname}}/level/start/1
+
+###
+
+// Stop a level
+POST {{hostname}}/level/stop/1

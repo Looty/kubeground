@@ -1,0 +1,14 @@
+local_resource(
+    'node build',
+    cmd='npm run build',
+    dir="frontend",
+    labels=["frontend"],
+    deps=["src/"]
+)
+
+# local_resource(
+#     'npm run jest:build',
+#     cmd='npm run build',
+#     dir="frontend",
+#     labels=["build"]
+# )
