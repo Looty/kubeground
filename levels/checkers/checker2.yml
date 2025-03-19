@@ -1,0 +1,17 @@
+apiVersion: checker.looty.com/v1
+kind: Checker
+metadata:
+  name: checker2
+  namespace: default
+spec:
+  questRef: "2"
+  validation: |
+    #!/bin/bash
+
+    replicas=$(kubectl get deployment/nginx -n default -o jsonpath='{.spec.replicas}')
+
+    if [ "$replicas" == 2 ]; then
+      exit 0
+    fi
+
+    exit 1

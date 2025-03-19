@@ -1,0 +1,65 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: quests.quest.looty.com
+spec:
+  group: quest.looty.com
+  versions:
+    - name: v1
+      # Each version can be enabled/disabled by Served flag.
+      served: true
+      # One and only one version must be marked as the storage version.
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - spec
+          properties:
+            spec:
+              type: object
+              properties:
+                level:
+                  type: integer
+                  default: 1
+                instructions:
+                  type: string
+                  default: ""
+                hints:
+                  type: string
+                  default: ""
+                manifests:
+                  type: string
+                  default: ""
+                completed:
+                  type: boolean
+                  default: false
+      additionalPrinterColumns:
+        - name: Level
+          type: string
+          description: The level index number
+          jsonPath: .spec.level
+        - name: Completed
+          type: string
+          description: The quest completion status
+          jsonPath: .spec.completed
+        - name: Instructions
+          type: string
+          description: The quest instructions
+          jsonPath: .spec.instructions
+        - name: Hints
+          type: string
+          description: The quest hints for completion
+          jsonPath: .spec.hints
+        - name: Manifests
+          type: string
+          description: The quest YAML manifests
+          jsonPath: .spec.manifests
+  scope: Namespaced
+  names:
+    kind: Quest
+    plural: quests
+    singular: quest
+    shortNames:
+      - quests
+      - q

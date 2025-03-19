@@ -1,0 +1,18 @@
+apiVersion: checker.looty.com/v1
+kind: Checker
+metadata:
+  name: checker4
+  namespace: default
+spec:
+  questRef: "4"
+  validation: |
+    #!/bin/bash
+
+    image=$(kubectl get deployment/redis -n default -o jsonpath='{.spec.template.spec.containers[0].image}')
+    replicas=$(kubectl get deployment/redis -n default -o jsonpath='{.spec.replicas}')
+
+    if [ "$image" == "redis" ] && [ "$replicas" == "6" ]; then
+      exit 0
+    fi
+
+    exit 1

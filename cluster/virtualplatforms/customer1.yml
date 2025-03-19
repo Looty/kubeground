@@ -1,0 +1,17 @@
+apiVersion: looty.example.org/v1alpha1
+kind: VirtualPlatform
+metadata:
+  name: "erez-mizrahi"
+  namespace: virtual-platform
+  labels:
+    customer.name: "erez.mizrahi"
+    customer.id: "54f8a4c8-e0d1-701c-4b68-dbf5fae6e6f6"
+  annotations:
+    customer.email: "erez.mizrahi@gmail.com"
+    customer.creation: "2024-08-15 08:47:02.428041"
+    customer.timestamp: "1723020422"
+spec:
+  vcluster:
+    values: {}
+  platform:
+    values: {}
