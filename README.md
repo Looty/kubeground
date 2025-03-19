@@ -42,7 +42,7 @@ kubeground uses many popular open source tools, including:
 k3d cluster create -c cluster/k3d.yml
 
 # Install vCluster
-`helm upgrade --install my-vcluster vcluster --repo https://charts.loft.sh --create-namespace --namespace team-x --repository-config='' --set sync.toHost.ingresses.enabled=true --version 0.20.0-beta.5
+helm upgrade --install my-vcluster vcluster --repo https://charts.loft.sh --create-namespace --namespace team-x --repository-config='' --set sync.toHost.ingresses.enabled=true --version 0.20.0-beta.5
 
 # Install helm charts
 helm install quest-operator ./charts/quest-operator/ --create-namespace -n quest-operator
@@ -74,20 +74,19 @@ docker push looty10/kubeground:v1.0.0
 ### Build helm charts:
 #### Kubeground
 ```bash
-aws ecr-public get-login-password --region us-east-1 | helm registry login --username AWS --password-stdin <repository-url>>
+aws ecr-public get-login-password --region us-east-1 | helm registry login --username AWS --password-stdin <repository-url>
 helm package charts/kubeground
-helm push kubeground-1.0.0.tgz oci://<repository-url>>/kubeground/
+helm push kubeground-1.0.0.tgz oci://<repository-url>/kubeground/
 rm kubeground-1.0.0.tgz
 ```
 
 #### Quest-operator
 ```bash
-aws ecr-public get-login-password --region us-east-1 | helm registry login --username AWS \ --password-stdin <repository-url>>
+aws ecr-public get-login-password --region us-east-1 | helm registry login --username AWS \ --password-stdin <repository-url>
 helm package charts/quest-operator
-helm push quest-operator-1.0.0.tgz oci://<repository-url>>/kubeground/
+helm push quest-operator-1.0.0.tgz oci://<repository-url>/kubeground/
 rm quest-operator-1.0.0.tgz
 ```
-
 
 Navigate to the local [dashboard](localhost:4000/) to start init some levels
 
