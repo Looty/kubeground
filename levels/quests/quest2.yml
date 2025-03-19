@@ -1,0 +1,34 @@
+apiVersion: quest.looty.com/v1
+kind: Quest
+metadata:
+  name: quest2
+  namespace: default
+spec:
+  level: 2
+  instructions: |
+    scale nginx deployment replicas to exactly 2
+  hints: |
+    1. x
+    2. y
+    ...
+  manifests: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: nginx
+      namespace: default
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: nginx
+      template:
+        metadata:
+          labels:
+            app: nginx
+        spec:
+          containers:
+            - name: nginx
+              image: nginx:latest
+              ports:
+                - containerPort: 80

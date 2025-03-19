@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{ template "head" . }}
+
+<body>
+    {{ template "navbar" . }}
+    <div class="main">
+        <div class="container">
+            <div class="card">
+                <div class="card-header">Quests {{ or .QuestLevel "N/A" }} | {{ or .QuestName "N/A" }}</div>
+                <div class="card-body">
+                    <div class="card-text">
+                        <div class="row">
+                            <div class="col-10">
+                                <strong>Instructions:</strong>
+                            </div>
+                            <div class="col-2">
+                                <p><strong>Status:</strong> {{ .Completed }}</p>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <pre>
+                                {{ or .Instructions "No instructions were set.." }}
+                            </pre>
+                        </div>
+                        <div class="row">
+                            <strong>Hints:</strong>
+                            <pre>
+                                {{ or .Hints "No hints were set.." }}
+                            </pre>
+                        </div>
+                        <div class="row">
+                            <strong>Manifests:</strong>
+                            <pre>
+                                {{ or .Manifests "No Kubernetes manifests were set.." }}
+                            </pre>
+                        </div>
+                        <div class="row">
+                            <div class="d-grid gap-1">
+                                <form action="/quest/{{ .QuestLevel }}/apply" method="POST">
+                                    <button type="submit" class="btn btn-success btn-lg">Apply</button>
+                                </form>
+                                <form action="/quest/{{ .QuestLevel }}/delete" method="POST">
+                                    <button type="submit" class="btn btn-danger btn-lg">Delete</button>
+                                </form>
+                                <form action="/quest/{{ .QuestLevel }}/restart" method="POST">
+                                    <button type="submit" class="btn btn-info btn-lg">Restart</button>
+                                </form>
+                                <form action="/quest/{{ .QuestLevel }}/validate" method="POST">
+                                    <button type="submit" class="btn btn-warning btn-lg">Validate</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,9 @@
+apiVersion: looty.example.org/v1alpha1
+kind: VirtualPlatform
+metadata:
+  name: customer2
+spec:
+  vcluster:
+    values: {}
+  platform:
+    values: {}

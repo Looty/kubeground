@@ -1,0 +1,17 @@
+apiVersion: checker.looty.com/v1
+kind: Checker
+metadata:
+  name: checker1
+  namespace: default
+spec:
+  questRef: "1"
+  validation: |
+    #!/bin/bash
+
+    selector=$(kubectl get svc/nginx-service -n default -o jsonpath='{.spec.selector.app}')
+
+    if [ "$selector" == "nginx" ]; then
+      exit 0
+    fi
+
+    exit 1

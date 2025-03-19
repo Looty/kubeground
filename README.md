@@ -15,21 +15,77 @@ Discover kubeground, an open-source app that provides Kubernetes training in a u
 kubeground uses many popular open source tools, including:
 
 1. [**Go Echo:**](https://echo.labstack.com/) High performance, extensible, minimalist Go web framework.
-2. [**GORM:**](https://gorm.io/) The fantastic ORM library for Golang, aims to be developer friendly.
-3. [**kubernetes/client-go:**](https://github.com/kubernetes/client-go) Go clients for talking to a kubernetes cluster.
-4. [**Kind:**](https://kind.sigs.k8s.io/) kind is a tool for running local Kubernetes clusters using Docker container “nodes”.
-   kind was primarily designed for testing Kubernetes itself, but may be used for local development or CI.
-5. [**Tilt:**](https://tilt.dev/) A toolkit for fixing the pains of microservice development.
-6. [**Vite:**](https://vitejs.dev) a bundler that takes the boilerplate out of your set up. It'll compile JS component frameworks, handle CSS preprocessors with little-to-no config (say, SCSS and PostCSS), and show dev changes on-the-fly using [hot module replacement (HMR)](https://vitejs.dev/guide/features.html#hot-module-replacement).
-
-7. [**React:**](https://reactjs.org/) React is a JavaScript library for building user interfaces.
-8. [**MUI:**](https://mui.com/) MUI Core contains foundational React UI component libraries for shipping new features faster.
+2. [**kubernetes/client-go:**](https://github.com/kubernetes/client-go) Go clients for talking to a kubernetes cluster.
+3. [**Kind:**](https://kind.sigs.k8s.io/) Kind is a tool for running local Kubernetes clusters using Docker container "nodes". Kind was primarily designed for testing Kubernetes itself, but may be used for local development or CI.
+4. [**Crossplane + Provider:**](https://crossplane.io/) Crossplane is an open source Kubernetes add-on that enables platform teams to assemble infrastructure from multiple vendors, and expose higher level self-service APIs for application teams to consume.
+5. [**ArgoCD:**](https://argoproj.github.io/cd/) ArgoCD is a declarative, GitOps continuous delivery tool for Kubernetes that automates the deployment of applications to specified target environments.
+6. [**Terraform:**](https://www.terraform.io/) Terraform is an open-source infrastructure as code software tool that enables you to safely and predictably create, change, and improve infrastructure.
+7. [**AWS:**](https://aws.amazon.com/) Amazon Web Services offers reliable, scalable, and inexpensive cloud computing services for businesses and individuals.
+8. [**Custom kubernetes operator:**](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) Kubernetes operators are software extensions to Kubernetes that make use of custom resources to manage applications and their components.
+## Images
+![Main](docs/kubeground-main.png)
+![Quest profile](docs/kubeground-quest-profile.png)
+![Quests CRD](docs/kubeground-quests-crd.png)
+![Checkers CRD](docs/kubeground-checkers-crd.png)
 
 ## Getting started
 
-```go
-cd backend
-go run .
+### Prerequisites
+1. Have local cluster running
+2. Deploy quest-operator
+3. Apply Quests + Checkers
+4. Run/Deploy kubeground
+
+### Run steps
+```bash
+# Install local cluster
+k3d cluster create -c cluster/k3d.yml
+
+# Install vCluster
+helm upgrade --install my-vcluster vcluster --repo https://charts.loft.sh --create-namespace --namespace team-x --repository-config='' --set sync.toHost.ingresses.enabled=true --version 0.20.0-beta.5
+
+# Install helm charts
+helm install quest-operator ./charts/quest-operator/ --create-namespace -n quest-operator
+helm install kubeground ./charts/kubeground --create-namespace -n kubeground
+
+# Install crossplane
+helm repo add crossplane-stable https://charts.crossplane.io/stable
+helm repo update
+helm upgrade --install crossplane --namespace crossplane-system --create-namespace crossplane-stable/crossplane
+
+# Prepare quests & checkers CRs
+kubectl apply -f levels --recursive
+
+# Run the webserver
+go run main.go
+```
+
+### Cleanup
+```bash
+k3d cluster delete -a
+```
+
+### Build docker
+```bash
+docker build -t looty10/kubeground:v1.0.0 .
+docker push looty10/kubeground:v1.0.0
+```
+
+### Build helm charts:
+#### Kubeground
+```bash
+aws ecr-public get-login-password --region us-east-1 | helm registry login --username AWS --password-stdin <repository-url>
+helm package charts/kubeground
+helm push kubeground-1.0.0.tgz oci://<repository-url>/kubeground/
+rm kubeground-1.0.0.tgz
+```
+
+#### Quest-operator
+```bash
+aws ecr-public get-login-password --region us-east-1 | helm registry login --username AWS \ --password-stdin <repository-url>
+helm package charts/quest-operator
+helm push quest-operator-1.0.0.tgz oci://<repository-url>/kubeground/
+rm quest-operator-1.0.0.tgz
 ```
 
 Navigate to the local [dashboard](localhost:4000/) to start init some levels

@@ -1,0 +1,116 @@
+name: CI
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches:
+      - main
+
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Get dependencies
+        run: go mod tidy
+
+      # TODO: fail on issues, currently errors are OK
+      - name: Go linter
+        uses: golangci/golangci-lint-action@v6.0.1
+        with:
+          args: --timeout=3m --issues-exit-code 0
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Get dependencies
+        run: go mod tidy
+
+      - name: Go test
+        run: go test -v .
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Get dependencies
+        run: go mod tidy
+
+      - name: Build docker
+        run: docker build .
+
+  test-quests:
+    runs-on: ubuntu-latest
+    needs: [lint, test]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: kubeground
+
+      - name: Checkout Q&C repository
+        uses: actions/checkout@v4
+        with:
+          repository: Looty/kubeground-config
+          path: kubeground-config
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install tools
+        run: |
+          echo "Installing k3d.."
+          curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+
+          echo "Installing kubectl.."
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+          echo "Installing helm.."
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+
+          echo "Installing yq.."
+          curl -LO https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_amd64
+          mv yq_linux_amd64 yq
+          sudo install -o root -g root -m 0755 yq /usr/local/bin/yq
+
+      - name: Init cluster
+        run: k3d cluster create -c kubeground/cluster/k3d.yml
+
+      - name: Deploy helm charts
+        run: |
+          helm install quest-operator kubeground/charts/quest-operator -n default
+          helm install kubeground kubeground/charts/kubeground -n default
+
+      - name: Apply Q&C
+        run: kubectl apply -f kubeground-config/collections --recursive
+
+      - name: Validate checkers
+        run: |
+          echo "Validating.."
+
+      - name: Clean workspace
+        run: k3d cluster delete -a

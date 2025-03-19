@@ -1,0 +1,48 @@
+apiVersion: quest.looty.com/v1
+kind: Quest
+metadata:
+  name: quest1
+  namespace: default
+spec:
+  level: 1
+  instructions: |
+    fix nginx-service to target nginx deployment pods
+  hints: |
+    1. x
+    2. y
+    ...
+  manifests: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: nginx
+      namespace: default
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: nginx
+      template:
+        metadata:
+          labels:
+            app: nginx
+        spec:
+          containers:
+            - name: nginx
+              image: nginx:latest
+              ports:
+                - containerPort: 80
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: nginx-service
+      namespace: default
+    spec:
+      type: ClusterIP
+      selector:
+        app: ngins
+      ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 80

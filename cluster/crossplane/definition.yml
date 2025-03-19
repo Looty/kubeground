@@ -1,0 +1,36 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xvirtualplatforms.looty.example.org
+spec:
+  group: looty.example.org
+  names:
+    kind: XVirtualPlatform
+    plural: xvirtualplatforms
+  claimNames:
+    kind: VirtualPlatform
+    plural: virtualplatforms
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                vcluster:
+                  type: object
+                  properties:
+                    values:
+                      description: Values for vcluster Helm chart
+                      type: object
+                platform:
+                  type: object
+                  properties:
+                    values:
+                      x-kubernetes-preserve-unknown-fields: true
+                      description: Values for platform Helm charts
+                      type: object

@@ -1,0 +1,17 @@
+apiVersion: quest.looty.com/v1
+kind: Quest
+metadata:
+  name: quest3
+  namespace: default
+spec:
+  level: 3
+  instructions: |
+    create the following PersistentVolume:
+    1. name: "pv-three"
+    2. namespace: "default"
+    3. storage: 1Gi
+    4. hostPath: "/path/to/file"
+  hints: |
+    1. x
+    2. y
+    ...

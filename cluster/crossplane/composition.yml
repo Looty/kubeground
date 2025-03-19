@@ -1,0 +1,99 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: virtualplatform
+  namespace: crossplane-system
+  labels:
+    crossplane.io/xrd: xvirtualplatforms.looty.example.org
+spec:
+  compositeTypeRef:
+    apiVersion: looty.example.org/v1alpha1
+    kind: XVirtualPlatform
+  resources:
+    - name: vcluster
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: Release
+        name: vcluster-test-platform
+        spec:
+          forProvider:
+            chart:
+              name: vcluster
+              repository: https://charts.loft.sh
+              version: 0.19.0
+            namespace: vcluster-test
+            values:
+              syncer:
+                extraArgs:
+                  - --out-kube-config-secret=vcluster-kubeconfig
+              sync:
+                toHost:
+                  ingresses:
+                    enabled: true
+                  podDisruptionBudgets:
+                    enabled: true
+          providerConfigRef:
+            name: helm-provider
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.namespace
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-vcluster"
+    - name: kubeground
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: Release
+        metadata:
+          name: kubeground
+        spec:
+          providerConfigRef:
+            name: helm-provider
+          forProvider:
+            chart:
+              name: kubeground
+              repository: https://Looty.github.io/kubeground/
+              version: 0.1.0
+            namespace: kubeground
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.namespace
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-kubeground"
+    - name: quest-operator
+      base:
+        apiVersion: helm.crossplane.io/v1beta1
+        kind: Release
+        metadata:
+          name: quest-operator
+        spec:
+          providerConfigRef:
+            name: helm-provider
+          forProvider:
+            chart:
+              name: quest-operator
+              repository: https://Looty.github.io/kubeground/
+              version: 0.1.0
+            namespace: quest-operator
+      patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.name
+          toFieldPath: spec.forProvider.namespace
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.name
+          toFieldPath: metadata.name
+          transforms:
+            - type: string
+              string:
+                fmt: "%s-quest-operator"

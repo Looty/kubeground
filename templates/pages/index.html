@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{ template "head" . }}
+
+<body>
+    {{ template "navbar" . }}
+    <div class="main">
+        <div class="container">
+            <div class="d-flex justify-content-center">
+                <span class="badge rounded-pill text-bg-secondary">Quests done</span>
+            </div>
+            <br />
+            {{ .CompletedQuestsNum }}
+            <br />
+            {{ range $index, $alert := .Alerts }}
+				<div class="alert alert-{{ $alert.alertType }} alert-dismissible fade show" role="alert">
+                    {{ if $alert.spinner }}
+                        <div class="spinner-border text-primary" role="status"></div>
+                    {{ end }}
+                    <div>
+                        {{ if $alert.error }}
+                        <strong>{{ $alert.message }}</strong> // Error: {{ $alert.error }} // {{ $alert.time }}
+                        {{ else }}
+                        <strong>{{ $alert.message }}</strong> // {{ $alert.time }}
+                        {{ end }}
+                        <form action="/remove_alert" method="POST" style="display:inline;">
+                            <input type="hidden" name="index" value="{{ $index }}">
+                            <button type="submit" class="close" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {{ else }}
+            {{ end }}
+            <div class="card">
+                <div class="card-header">Quests | Dashboard</div>
+                <div class="card-body">
+                    <p class="card-text">
+
+                    {{ if not .Quests }}
+                    <p>Nothing to show yet</p>
+                    {{ else }}
+
+                    {{ range .Quests }}
+
+                    {{ if .Spec.Completed }}
+                    <a href="/quest/{{ .Spec.Level }}" class="btn btn-outline-dark btn-success btn-lg" role="button">
+                        {{ .Spec.Level }}
+                    </a>
+                    {{ else }}
+                    <a href="/quest/{{ .Spec.Level }}" class="btn btn-outline-dark btn-warning btn-lg" role="button">
+                        {{ .Spec.Level }}
+                    </a>
+                    {{ end }}
+
+                    {{ end }}
+
+                    {{ end }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

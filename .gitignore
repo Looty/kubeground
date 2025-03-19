@@ -16,3 +16,9 @@
 
 backend/kubeground
 backend/project.db
+
+operator/src/__pycache__
+*/.terraform/*
+*.tfstate*
+
+lambda/output/*

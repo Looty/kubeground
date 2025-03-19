@@ -1,0 +1,17 @@
+apiVersion: quest.looty.com/v1
+kind: Quest
+metadata:
+  name: quest4
+  namespace: default
+spec:
+  level: 4
+  instructions: |
+    create the following Deployment:
+    1. name: "redis"
+    2. namespace: "default"
+    3. image: "redis"
+    4. replicas: 6
+  hints: |
+    1. x
+    2. y
+    ...
